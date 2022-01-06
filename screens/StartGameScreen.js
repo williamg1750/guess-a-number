@@ -7,10 +7,12 @@ import {
   Button,
   TouchableWithoutFeedback,
   Keyboard,
+  Alert,
 } from 'react-native';
 import Card from '../components/Card';
 import Colors from '../Constants/colors';
 import Input from '../components/Input';
+import NumberContainer from '../components/NumberContainer';
 
 const StartGameScreen = (props) => {
   const [enteredValue, setEnteredValue] = useState('');
@@ -29,19 +31,31 @@ const StartGameScreen = (props) => {
   const confirmInputHandler = () => {
     const chosenNumber = parseInt(enteredValue);
     //check to see if the value is between 0 - 99 or not a num then you return and not set states that shouldnt be set
-    if (chosenNumber === NaN || chosenNumber <= 0 || chosenNumber > 99) {
+    if (isNaN(chosenNumber) || chosenNumber <= 0 || chosenNumber > 99) {
+      Alert.alert(
+        'Invaid Number!',
+        'Number has to be a number between 1 and 99.',
+        [{ text: 'Okay', style: 'destructive', onPress: resetInputHandler }]
+      );
       return;
     }
     setConfirmed(true);
     setSelectedNumber(chosenNumber);
     setEnteredValue('');
     //doesnt matter what order the hook sets are in they are batched togather in on render cycle
+    Keyboard.dismiss();
   };
 
   let confirmedOutput;
   //logic to show feedback which shows JSX code
   if (confirmed) {
-    confirmedOutput = <Text>Chosen Number: {selectedNumber} </Text>;
+    confirmedOutput = (
+      <Card style={styles.summaryContainer}>
+        <Text>You selected</Text>
+        <NumberContainer>{selectedNumber}</NumberContainer>
+        <Button title='Start Game' />
+      </Card>
+    );
   }
 
   return (
@@ -114,6 +128,10 @@ const styles = StyleSheet.create({
   input: {
     width: 50,
     textAlign: 'center',
+  },
+  summaryContainer: {
+    marginTop: 20,
+    alignItems: 'center',
   },
 });
 
